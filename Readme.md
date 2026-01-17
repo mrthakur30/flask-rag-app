@@ -1,139 +1,137 @@
-# 🧠 RAG Flask – Custom GenAI & Agentic AI Backend
+# 🧠 RAG Flask – GenAI & Agentic AI From Scratch
 
-A **from-scratch Retrieval-Augmented Generation (RAG) system** built with **Flask**, **Groq LLMs**, and a **custom vector store**, without relying on heavy frameworks like LangChain.
+A **from-scratch Retrieval-Augmented Generation (RAG) system** built using **Flask**, **Groq LLMs**, and a **custom in-memory vector store**, without LangChain or heavy abstractions.
 
-This project is designed to deeply understand **GenAI fundamentals**, **RAG architecture**, and **Agentic AI concepts**, making it **interview-ready and production-aligned**.
-
----
-
-## 🚀 Features
-
-* ✅ Custom RAG pipeline (no LangChain)
-* ✅ Text chunking with overlap
-* ✅ SentenceTransformer embeddings
-* ✅ In-memory vector store with cosine similarity
-* ✅ Semantic retrieval (Top-K search)
-* ✅ Groq-powered answer generation
-* ✅ Flask API (`/ingest`, `/query`)
-* ✅ Agentic AI foundations (tool-based reasoning)
-* ✅ Clean, modular architecture
+This project is intentionally designed for **deep understanding**, **debuggability**, and **job readiness** in GenAI / Agentic AI roles.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🚀 What This Project Teaches
+
+* How RAG actually works under the hood
+* How embeddings, chunking, and vector search fit together
+* How LLMs are grounded using retrieved context
+* How Agentic AI differs from simple chatbots
+* How to structure GenAI backends like real systems
+
+No magic. No black boxes.
+
+---
+
+## 🏗️ High-Level Architecture
 
 ```
 User
  ├── POST /ingest ──▶ Chunker ─▶ Embedder ─▶ Vector Store
  └── POST /query  ──▶ Retriever ─▶ Prompt Builder ─▶ Groq LLM ─▶ Answer
+                         ▲
+                         └──── Agent (decision logic)
 ```
 
-### Key Design Principles
+Key principles:
 
-* **Separation of concerns** (ingestion, retrieval, generation)
-* **Shared singleton vector store** to avoid state bugs
-* **Framework-agnostic core logic**
-* **Grounded answers (hallucination control)**
+* Clear **write path** (ingestion)
+* Clear **read path** (retrieval + generation)
+* Shared vector store state
+* Agent controls *when* tools are used
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Structure (Explained)
 
 ```
 rag-flask/
-├── app.py                     # Flask entry point
-├── ingest/
-│   ├── chunker.py              # Text chunking logic
-│   ├── embedder.py             # Embedding layer
-│   └── ingest_service.py       # Ingestion pipeline
-├── retrieval/
-│   └── retriever.py            # Semantic search
-├── generation/
-│   ├── groq_client.py          # Groq LLM wrapper
-│   ├── prompt.py               # Prompt construction
-│   └── answer_generator.py     # RAG answer generation
-├── agent/
-│   └── simple_agent.py         # Agentic AI loop
-├── store/
-│   ├── vector_store.py         # Custom vector DB
-│   └── store.py                # Singleton store
+├── app.py                    # Flask entry point (API)
+├── config.py                 # App & model configuration
+├── ingest/                   # Write path (indexing)
+│   ├── chunker.py            # Text chunking with overlap
+│   ├── embedder.py           # Embedding generation
+│   └── ingest_service.py     # Ingestion orchestration
+├── store/                    # Memory & similarity layer
+│   ├── vector_store.py       # Custom vector DB + cosine similarity
+│   └── store.py              # Singleton vector store instance
+├── query/                    # Read path (RAG pipeline)
+│   ├── retriever.py          # Semantic search
+│   ├── prompt.py             # Prompt construction
+│   ├── groq_client.py        # Groq API wrapper
+│   └── generate_answer.py    # RAG answer generation
+├── agent/                    # Agentic AI logic
+│   └── simple_agent.py       # Tool-using decision loop
+├── requirements.txt
+├── .env
 └── README.md
 ```
 
----
-
-## 🧠 How RAG Works Here
-
-1. **Ingestion**
-
-   * Raw text is chunked with overlap
-   * Chunks are embedded into vectors
-   * Stored in a custom vector store
-
-2. **Retrieval**
-
-   * User query is embedded
-   * Cosine similarity finds relevant chunks
-
-3. **Generation**
-
-   * Retrieved context is injected into prompt
-   * Groq LLM generates a grounded answer
-   * If context is missing → "I don’t know"
+Each folder maps to a **real production concern**, not a framework abstraction.
 
 ---
 
-## 🧪 API Usage
+## 🧠 RAG Flow (Step-by-Step)
 
-### 🔹 Health Check
+### 1️⃣ Ingestion
 
-```
-GET /health
-```
+* Raw text is chunked with overlap
+* Each chunk is embedded into a vector
+* Vectors are stored in the vector store
 
-Response:
+Why overlap?
 
-```json
-{
-  "status": "ok",
-  "vectors": 5
-}
-```
+* Prevents semantic loss at chunk boundaries
+* Improves retrieval accuracy
 
 ---
 
-### 🔹 Ingest Data
+### 2️⃣ Retrieval
 
-```
-POST /ingest
-Content-Type: application/json
-
-{
-  "text": "JWT tokens are stateless authentication tokens..."
-}
-```
+* User question is embedded
+* Cosine similarity finds top-K relevant chunks
+* Retrieved chunks form the **grounded context**
 
 ---
 
-### 🔹 Query
+### 3️⃣ Generation
+
+* Context + question are injected into a strict prompt
+* Groq LLM generates an answer
+* If context is missing → model must say **"I don’t know"**
+
+This is hallucination control.
+
+---
+
+## 🤖 Agentic AI (Important)
+
+This project does **not** treat agents as libraries.
+
+An agent here is:
+
+* A control loop
+* With access to tools (retriever, LLM)
+* Making decisions based on state
+
+Example reasoning:
 
 ```
-POST /query
-Content-Type: application/json
-
-{
-  "question": "How do JWT tokens expire?"
-}
+If context is empty → don’t answer
+If question is vague → retrieve first
+If answer already known → skip retrieval
 ```
 
-Response:
+This mirrors real agent systems.
 
-```json
-{
-  "question": "How do JWT tokens expire?",
-  "answer": "JWT tokens expire after a fixed duration..."
-}
-```
+---
+
+## ❌ Why No LangChain?
+
+LangChain is intentionally avoided to:
+
+* Understand fundamentals deeply
+* Avoid hidden abstractions
+* Make debugging obvious
+* Explain systems clearly in interviews
+* Maintain full architectural control
+
+Frameworks can be added **after mastery**, not before.
 
 ---
 
@@ -143,22 +141,22 @@ Response:
 
 ```
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\\Scripts\\activate
 ```
 
 ### 2️⃣ Install Dependencies
 
 ```
-pip install flask sentence-transformers groq
+pip install -r requirements.txt
 ```
 
-### 3️⃣ Set Environment Variable
+### 3️⃣ Set Environment Variables
 
 ```
-setx GROQ_API_KEY "your_groq_api_key"
+GROQ_API_KEY=your_api_key_here
 ```
 
-### 4️⃣ Run Server
+### 4️⃣ Run the App
 
 ```
 python app.py
@@ -166,69 +164,55 @@ python app.py
 
 ---
 
-## 🤖 Agentic AI (STEP 9)
+## 🧪 Example Usage
 
-This project introduces **Agentic AI concepts** without frameworks:
+### Ingest
 
-* Tool-based reasoning
-* Conditional execution
-* Multi-step decision logic
+```
+POST /ingest
+{
+  "text": "JWT tokens are stateless authentication tokens..."
+}
+```
 
-Agents are implemented as **control-flow loops**, not magic abstractions.
+### Query
 
----
-
-## ❌ Why Not LangChain?
-
-* Avoids hidden abstractions
-* Easier debugging
-* Stable core logic
-* Better interview explanations
-* Full control over retrieval & generation
-
-LangChain can be added later **once fundamentals are solid**.
-
----
-
-## 📌 Known Limitations (Intentional)
-
-* In-memory vector store (resets on restart)
-* Single-process Flask app
-* No authentication
-* No streaming responses
-
-These are solvable extensions.
+```
+POST /query
+{
+  "question": "How do JWT tokens expire?"
+}
+```
 
 ---
 
 ## 🧑‍💻 Skills Demonstrated
 
 * GenAI system design
-* RAG fundamentals
+* RAG from scratch
 * Vector similarity search
 * Prompt engineering
-* Agentic AI concepts
+* Agentic AI fundamentals
 * Flask backend development
-* Debugging real-world AI issues
+* Real-world debugging
 
 ---
 
-## 📄 Resume-Ready Description
+## 📄 Resume-Ready Line
 
-> Built a custom Retrieval-Augmented Generation (RAG) backend using Flask and Groq LLMs with semantic search, vector similarity retrieval, and agentic AI foundations — without relying on LangChain.
+> Built a custom Retrieval-Augmented Generation (RAG) backend using Flask and Groq LLMs with semantic search, grounded generation, and agentic decision logic — without LangChain.
 
 ---
 
-## 🚀 Next Possible Enhancements
+## 🚀 Future Extensions
 
 * Persistent vector DB (FAISS / Qdrant)
 * Streaming responses
-* Tool calling via MCP
+* MCP-style tool servers
 * Multi-agent collaboration
-* Evaluation & metrics
-* Authentication & rate limiting
+* Evaluation & observability
 
 ---
 
 **Author:** Mukul Thakur
-**Purpose:** Learning-first, job-ready GenAI engineering
+**Focus:** Learning-first, production-aligned GenAI engineering
