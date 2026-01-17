@@ -1,0 +1,85 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib
+lib64
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.whl
+*.pyc1
+*.pyc2
+*.pyc3
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+
+# Unit test and coverage reports
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+.pytest_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PEP 582; used by e.g. pdm
+__pypackages__/
+
+# mkdocs documentation
+.mkdocs_cache
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Environments
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder (Python IDE)
+.spyderproject
+.spyproject
+
+# Rope (Python IDE)
+.ropeproject
+
+# top secret files
+# you can add your own custom files here
+# e.g. secret_token.txt
+.env
